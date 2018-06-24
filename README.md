@@ -1,1 +1,1 @@
-This is the calculator project from Thr Odin Project found [here](https://www.theodinproject.com/courses/web-development-101/lessons/calculator?ref=lnav).
+This is the calculator project from The Odin Project found [here](https://www.theodinproject.com/courses/web-development-101/lessons/calculator?ref=lnav).

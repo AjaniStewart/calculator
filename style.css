@@ -1,0 +1,13 @@
+* {
+    margin:0;
+    padding:0;
+}
+
+.buttonContainer {
+    display: grid;
+    grid-template: repeat(5,1fr) / repeat(4,1fr);
+}
+.buttonContainer div {
+    background: pink;
+    border: 1px solid black;
+}
