@@ -1,13 +1,53 @@
+@font-face {
+    src: url("fonts/digital-7/digital-7.ttf");
+    font-family: "Digital-7";
+}
+
 * {
     margin:0;
     padding:0;
 }
 
+.calculator {
+    height: 700px;
+    width: 500px;
+    position: absolute;
+    left: 30%;
+    /* down with the bourgeoisie! */
+    top: 1%;
+    border: 2px solid black;
+    border-radius: 5px;
+    font-family: "Roboto", sans-serif;
+}
+
+.display {
+    height: 130px;
+    width: inherit;
+    background: rgb(221, 221, 221);
+    font-size: 20px;
+    text-align: right;
+    font-family: "Digital-7", sans-serif;
+}
+
+.answer, .current {
+    height: 50%;
+    width: inherit;
+    background: inherit;
+    font-size: inherit;
+}
+
 .buttonContainer {
     display: grid;
     grid-template: repeat(5,1fr) / repeat(4,1fr);
+    height: 81.4%;
 }
 .buttonContainer div {
-    background: pink;
+    background: rgb(200, 236, 132);
     border: 1px solid black;
+    text-align: center;
+    transition: 0.2s ease-in;
+}
+
+.buttonContainer div:hover {
+    background: orange;
 }
