@@ -6,7 +6,7 @@ function divide(a,b) {
 }
 
 function operate(a, op, b) {
-    if (!a) return b + op;
+    if (!a) return b;
     switch(op) {
         case "+": return add(a,b);
         case "-": return subtract(a,b);
@@ -23,82 +23,119 @@ const mainDisplay = document.querySelector(".current");
 const currentAnswer = document.querySelector(".answer");
 
 //logic for digits
+function enterOperand(d) {
+    if (!errorEncountered) {
+        if (!equalsPressed) {
+            if (d.id !== "decimal") {
+                mainDisplay.textContent += d.id;
+            } else {
+                if (mainDisplay.textContent.search(/\./) === -1) {
+                    mainDisplay.textContent += ".";
+                }
+            }
+        } else {
+            mainDisplay.textContent = d.id === "decimal" ? "." : d.id;
+            equalsPressed = false;
+        }
+    }
+}
+
 const digits = document.querySelectorAll(".digit");
 digits.forEach(d => {
     d.addEventListener("click", () => {
-        if (!errorEncountered) {
-            if (!equalsPressed) {
-                if (d.id !== "decimal") {
-                    mainDisplay.textContent += d.id;
-                } else {
-                    if (mainDisplay.textContent.search(/\./) === -1) {
-                        mainDisplay.textContent += ".";
-                    }
-                }
-            } else {
-                mainDisplay.textContent = d.id === "decimal" ? "." : d.id;
-                equalsPressed = false;
-            }
-        }
+        enterOperand(d);
     });
 });
 
 //logic for functions
- const clearAll = document.querySelector("#clearAll");
- clearAll.addEventListener("click", () => {
+function clearAllFunc() {
     mainDisplay.textContent = "";
     currentAnswer.textContent = "";
     errorEncountered = false;
- });
+}
 
- const clearMain = document.querySelector("#clearCurrent");
- clearMain.addEventListener("click", () => {
+function clearCurrentFunc() {
     if (!errorEncountered) {
         mainDisplay.textContent = "";
     }
- });
+}
 
- const del = document.querySelector("#delete");
- del.addEventListener("click", () => {
+function delFunc() {
     if (!errorEncountered) {
         mainDisplay.textContent 
         = mainDisplay.textContent.slice(0, mainDisplay.textContent.length - 1);
     }
- });
+}
+
+ const clearAll = document.querySelector("#clearAll");
+ clearAll.addEventListener("click", clearAllFunc);
+
+ const clearMain = document.querySelector("#clearCurrent");
+ clearMain.addEventListener("click", clearCurrentFunc);
+
+ const del = document.querySelector("#delete");
+ del.addEventListener("click", delFunc);
 
  //logic for operations
  let prevOp;
+ function enterOperation(o) {
+    if (!errorEncountered) {
+        let left = currentAnswer.textContent.search(/\./) === -1 
+        ? parseInt(currentAnswer.textContent) 
+        : parseFloat(currentAnswer.textContent);
+
+        let right = mainDisplay.textContent.search(/\./) === -1 
+        ? parseInt(mainDisplay.textContent) 
+        : parseFloat(mainDisplay.textContent);
+
+        if (isNaN(left) && isNaN(right)) return;
+        if (isNaN(right)) {
+            prevOp = o.id;
+            currentAnswer.textContent 
+            = currentAnswer.textContent
+                           .slice(0, currentAnswer.textContent.length - 1);
+            currentAnswer.textContent += prevOp;
+        } else if (o.id !== "equals") {
+            if (!prevOp) prevOp = o.id;
+            currentAnswer.textContent = operate(left,prevOp,right) + o.id;
+            mainDisplay.textContent = "";
+            prevOp = o.id;
+        } else {
+            if (mainDisplay.textContent === "") return;
+            if (!prevOp) return;
+            mainDisplay.textContent = operate(left,prevOp,right);
+            currentAnswer.textContent = "";
+            prevOp = "";
+            equalsPressed = true;
+        }
+    } 
+ }
+
  const operations = document.querySelectorAll(".operation");
  operations.forEach(o => {
     o.addEventListener("click", () => {
-        if (!errorEncountered) {
-            let left = currentAnswer.textContent.search(/\./) === -1 
-            ? parseInt(currentAnswer.textContent) 
-            : parseFloat(currentAnswer.textContent);
-
-            let right = mainDisplay.textContent.search(/\./) === -1 
-            ? parseInt(mainDisplay.textContent) 
-            : parseFloat(mainDisplay.textContent);
-
-            if (isNaN(right)) {
-                prevOp = o.id;
-                currentAnswer.textContent 
-                = currentAnswer.textContent
-                               .slice(0, currentAnswer.textContent.length - 1);
-                currentAnswer.textContent += prevOp;
-            } else if (o.id !== "equals") {
-                if (!prevOp) prevOp = o.id;
-                currentAnswer.textContent = operate(left,prevOp,right);
-                mainDisplay.textContent = "";
-                prevOp = o.id;
-            } else {
-                mainDisplay.textContent = operate(left,prevOp,right);
-                currentAnswer.textContent = "";
-                prevOp = "";
-                equalsPressed = true;
-            }
-        } 
+        enterOperation(o);
     });
  });
 
-
+//keyboard support
+//Shift+del -> C
+//Ctrl (Cmd) + del -> AC
+//del -> del
+window.addEventListener("keydown", (e) => {
+    let element;
+    if (e.shiftKey && e.keyCode === 56) {
+        element = document.getElementById("*");
+    } else if (e.keyCode === 8) {
+        if (e.shiftKey) clearCurrentFunc();
+        else if (e.ctrlKey || e.metaKey) clearAllFunc();
+        else delFunc();
+    } else {
+        element = document.querySelector(`div[data-key="${e.keyCode}"]`);
+    }
+    if(!element) return;
+    switch (element.className) {
+        case "digit": enterOperand(element); break;
+        case "operation": enterOperation(element); break;
+    }
+});
