@@ -6,7 +6,7 @@ function divide(a,b) {
 }
 
 function operate(a, op, b) {
-    if (!a) return b;
+    if (a !== 0 && !a) return b;
     switch(op) {
         case "+": return add(a,b);
         case "-": return subtract(a,b);
@@ -18,13 +18,15 @@ function operate(a, op, b) {
 
 let errorEncountered = false;
 let equalsPressed = false;
+let length = 0;
+const MAX = 17;
 
 const mainDisplay = document.querySelector(".current");
 const currentAnswer = document.querySelector(".answer");
 
-//logic for digits
+//logic for entering digits
 function enterOperand(d) {
-    if (!errorEncountered) {
+    if (!errorEncountered && length < MAX) {
         if (!equalsPressed) {
             if (d.id !== "decimal") {
                 mainDisplay.textContent += d.id;
@@ -33,9 +35,11 @@ function enterOperand(d) {
                     mainDisplay.textContent += ".";
                 }
             }
+            length++;
         } else {
             mainDisplay.textContent = d.id === "decimal" ? "." : d.id;
             equalsPressed = false;
+            length = 1;
         }
     }
 }
@@ -52,19 +56,21 @@ function clearAllFunc() {
     mainDisplay.textContent = "";
     currentAnswer.textContent = "";
     errorEncountered = false;
+    length = 0;
 }
 
 function clearCurrentFunc() {
-    if (!errorEncountered) {
         mainDisplay.textContent = "";
-    }
+        length = 0;
+        errorEncountered = false;
 }
 
 function delFunc() {
     if (!errorEncountered) {
         mainDisplay.textContent 
         = mainDisplay.textContent.slice(0, mainDisplay.textContent.length - 1);
-    }
+        length--;
+    } else clearCurrentFunc();
 }
 
  const clearAll = document.querySelector("#clearAll");
@@ -80,6 +86,7 @@ function delFunc() {
  let prevOp;
  function enterOperation(o) {
     if (!errorEncountered) {
+        length = 0;
         let left = currentAnswer.textContent.search(/\./) === -1 
         ? parseInt(currentAnswer.textContent) 
         : parseFloat(currentAnswer.textContent);
@@ -90,6 +97,7 @@ function delFunc() {
 
         if (isNaN(left) && isNaN(right)) return;
         if (isNaN(right)) {
+            if (o.id === "equals") return;
             prevOp = o.id;
             currentAnswer.textContent 
             = currentAnswer.textContent
@@ -118,10 +126,8 @@ function delFunc() {
     });
  });
 
+
 //keyboard support
-//Shift+del -> C
-//Ctrl (Cmd) + del -> AC
-//del -> del
 window.addEventListener("keydown", (e) => {
     let element;
     if (e.shiftKey && e.keyCode === 56) {
