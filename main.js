@@ -66,7 +66,7 @@ function clearCurrentFunc() {
 }
 
 function delFunc() {
-    if (!errorEncountered) {
+    if (!errorEncountered && !equalsPressed) {
         mainDisplay.textContent 
         = mainDisplay.textContent.slice(0, mainDisplay.textContent.length - 1);
         length--;
